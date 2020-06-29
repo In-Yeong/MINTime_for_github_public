@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load bootstrap_pagination %}
+{% block head %} 게시판 {% endblock %}
+{% block content %}
+  <div class="w-100 my-5">
+    <div class="w-100 btn-group btn-group-sm overflow-auto" role="group">
+      <button id="btn-0" class="btn btn-outline-light my-2 my-sm-0"
+        onclick="location.href='{% url 'community:posts' %}'">전체게시판</button>
+      <button id="btn-1" class="btn btn-outline-light my-2 my-sm-0"
+        onclick="location.href='{% url 'community:pur_posts' 1 %}'">자유게시판</button>
+      <button id="btn-2" class="btn btn-outline-light my-2 my-sm-0"
+        onclick="location.href='{% url 'community:pur_posts' 2 %}'">건의게시판</button>
+      <button id="btn-3" class="btn btn-outline-light my-2 my-sm-0"
+        onclick="location.href='{% url 'community:pur_posts' 3 %}'">추천게시판</button>
+    </div>
+  </div>
+
+  {% if request.resolver_match.app_name == 'community' %}
+    <button class="btn btn-sm btn-info float-right mb-2 mr-3" onclick="location.href='{% url 'community:post_create' %}'">글 작성하기</button>
+  {% endif %}
+
+  <table class="table row m-0">
+    <thead class="col-12 thead-dark">
+      <tr class="row w-100 m-0">
+        <th class="col-1 text-center p-1">#</th>
+        <th class="col-7 col-md-8 p-1">제목</th>
+        <th class="col-4 col-md-3 p-1 text-center">작성자</th>
+      </tr>
+    </thead>
+    <tbody class="col-12">
+      {% for post in page_obj %}
+      <tr class="row m-0" onclick="location.href='{% url 'community:post_detail' post.pk %}'" style="cursor:pointer;">
+        <th class="col-1 p-1 text-center">{{ post.pk }}</th>
+        <td class="col-7 col-md-8 p-1 text-truncate" colspan="2">{{ post.title }} ({{ post.comment_p_set.all|length }})</td>
+        <td class="col-4 col-md-3 p-1 text-center text-truncate">{{ post.user }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  
+  <div class="d-flex justify-content-center my-5">
+    {% bootstrap_paginate page_obj range=5 show_prev_next="false" show_first_last="true" %}
+  </div>
+
+
+  <style>
+    tbody tr {
+      background-color: white;
+    }
+
+    tbody tr:hover {
+      background-color: powderblue;
+    }
+  </style>
+
+  <script>
+    var btnSubNum = window.location.href.indexOf('/posts/')
+    var btnNum = window.location.href[btnSubNum-1]
+    if (btnNum === 'y') {
+      document.getElementById(`btn-0`).classList.add('active')
+    } else {
+      document.getElementById(`btn-${btnNum}`).classList.add('active')
+    }
+  </script>
+{% endblock %}
+
+  

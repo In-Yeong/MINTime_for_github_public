@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% block head %} 회원가입 {% endblock %}
+{% block content %}
+<form class="my-5 mx-auto" action="" method="POST" style="max-width: 30rem;">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    <button class="btn btn-info float-right">회원가입</button>
+</form>
+{% endblock %}

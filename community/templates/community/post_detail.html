@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% block head %} 게시글 상세보기 {% endblock %}
+{% block content %}
+<button class="square_btn" onclick="history.back(-1);">뒤로가기</button>
+<div class="border-bottom p-3 mt-5" style="background-color: rgba(255, 255, 255, 0.5); border-color: darkslategray !important;">
+  <div>
+    <div class="font-weight-bold custom-break-word">{{ post.title }}</div>
+    <a class="text-dark custom-break-word" href="{% url 'accounts:profile' post.user 1 %}">작성자: {{ post.user }}</a>
+  </div>
+  <hr>
+  <pre class="custom-break-word">{{ post.content }}</pre>
+  <hr>
+  <div class="text-right">
+    <div><small>작성:{{ post.created_at }}</small></div>
+    <div><small>수정:{{ post.updated_at }}</small></div>
+  </div>
+  {% if user == post.user %}
+  <div class="text-right">
+    <form action="{% url 'community:post_delete' post.pk %}" method="POST">
+
+      <a href="{% url 'community:post_update' post.pk %}" class="square_btn">수정</a>
+      {% csrf_token %}
+      <button type="submit" class="square_btn" value="삭제">삭제</button>
+    </form>
+  </div>
+  {% endif %}
+</div>
+
+<br>
+
+{% for comment in post.comment_p_set.all %}
+<div class="border-bottom p-3"
+  style="background-color: rgba(255, 255, 255, 0.1); border-color: darkslategray !important;">
+
+  <div class="font-weight-bold custom-break-word">{{ comment.user.username }}</div>
+  <pre class="custom-break-word">{{ comment.content }}</pre>
+  <div class="row m-0 justify-content-end">
+    <div class="d-inline-block"><small>작성:{{ comment.created_at }}</small></div>
+    {% if user == comment.user %}
+    <div class="d-inline-block ml-1">
+      <form action="{% url 'community:com_p_delete' post.pk comment.pk %}" method="POST">
+        {% csrf_token %}
+        <input type="submit" class="square_btn" value="X">
+      </form>
+    </div>
+    {% endif %}
+  </div>
+
+
+</div>
+{% endfor %}
+
+
+
+<div class="mb-5">
+  <br>
+  {% if request.user.is_authenticated %}
+  <form action="{% url 'community:com_p_create' post.pk %}" method="POST">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    <button class="float-right btn btn-info">댓글 달기</button>
+  </form>
+  {% endif %}
+  <br>
+</div>
+
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load staticfiles %}
+{% block head %}결제실패{% endblock %}
+{% block content %}
+
+<div class="d-flex justify-content-center mt-2">
+  <div class="alert alert-warning" role="alert">
+    <h5 class="font-weight-bold">결제에 실패했어요..ㅠ</h5>
+  </div>
+</div>
+<div class="d-flex justify-content-center mt-2 mb-5">
+  <img src="{% static 'img/DB없음.png' %}" alt="" style="width: 50%; min-width: 20rem;">
+</div>
+
+{% endblock %}

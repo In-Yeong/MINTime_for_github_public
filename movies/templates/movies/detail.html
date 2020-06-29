@@ -1,0 +1,220 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load staticfiles %}
+{% block head %}영화 상세보기{% endblock %}
+{% block content %}
+
+
+<button class="square_btn" onclick="history.back(-1);">뒤로가기</button>
+<div class="backdrop row m-0 my-5">
+  <div class="col-12 col-md-3 align-self-center" style="height: 100%;">
+    <img src="https://image.tmdb.org/t/p/w500{{movie.poster_path}}" onerror="this.src='{% static 'img/no_photo.png' %}'" id="poster-img"  style="width: 100%;" alt="...">
+    {% if user.is_authenticated %}
+      <div class="position-absolute row align-items-center text-center rounded-circle bg-info mx-auto like-btn" data-pk="{{movie.pk}}" style="width: 3rem; height: 3rem; bottom: 0.5rem; left: 50%; transform: translateX(-50%);">
+      {% if user in movie.like_users.all %}          
+        <i class="mx-auto fas fa-heart fa-lg" data-pk="{{movie.pk}}" style="color:crimson"></i>
+      {% else %}
+        <i class="mx-auto fas fa-heart fa-lg" data-pk="{{movie.pk}}" style="color:white"></i>
+      {% endif %}
+      </div>
+    {% endif %}
+  </div>
+  
+  <div class="col-12 col-md-9 text-dark">
+    <h3 class="mt-3 custom-break-word">{{ movie.title }}</h3>
+    <div class="custom-break-word">장르: {{ movie.genres }}</div>
+    <hr>
+    <pre class="custom-break-word">{{ movie.overview }}</pre>
+    <hr>
+    <div>{{ movie.release_date }} 개봉</div>
+    <div>평점: {{ movie.vote_average }}</div>
+    <div class="custom-break-word">원제목: {{ movie.original_title }}</div>
+    <div>언어: {{ movie.original_language }}</div>
+    <hr>
+    <span class="cnt-{{movie.pk}}">{{ movie.like_users.all|length }}</span> 명이 이 영화를 좋아합니다.
+    <hr>
+  </div>
+  
+  
+  {% if user.is_staff %}
+  <div class="ml-auto pr-3 pb-3">
+    <a href="{% url 'managers:movie_update' movie.pk %}" class="square_btn">수정</a>
+    <a href="#" class="square_btn" data-toggle="modal" data-target="#{{ movie.movieid }}">삭제</a>
+
+    <div class="modal fade" id="{{ movie.movieid }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">안내</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            정말 삭제하시겠습니까?
+          </div>
+          <div class="modal-footer">
+            <a href="{% url 'managers:movie_delete' movie.pk %}" class="btn btn-danger">삭제</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+<div class="embed-responsive embed-responsive-16by9">
+  <iframe   
+    class="embed-responsive-item"
+    src='{{ video }}'
+    frameborder="0" 
+    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
+    allowfullscreen
+  ></iframe>
+</div>
+  
+<div class="py-3">
+  {% if avr == 0 %}
+  <div class="h5">첫번째로 리뷰를 작성해주세요!</div>
+  {% else %}
+  <h5>총 평점: {{ avr }}/5.0</h5>
+  {% endif %}
+  <hr>
+  {% for review in reviews %}
+  {% if user == review.user and updating == 'true' %}
+  <div></div>
+  {% else %}
+  <div class="border-bottom p-3" style="background-color: rgba(255, 255, 255, 0.1); border-color: darkslategray !important;">
+    <div>
+      <div class="d-inline-block" style="h6">
+        {% if review.star == 1 %}
+        ★☆☆☆☆
+        {% elif review.star == 2 %}
+        ★★☆☆☆
+        {% elif review.star == 3 %}
+        ★★★☆☆
+        {% elif review.star == 4 %}
+        ★★★★☆
+        {% else %}
+        ★★★★★
+        {% endif %}
+      </div>
+      <div class="d-inline-block custom-break-word">{{ review.user }}</div>
+    </div>
+    <hr>
+    <pre class="custom-break-word">{{ review.content }}</pre>
+    <hr>
+    <div class="text-right">
+      <div><small>작성:{{ review.created_at }}</small></div>
+      <div><small>수정:{{ review.updated_at }}</small></div>
+    </div>
+    
+    {% if user == review.user %}
+    <div class="text-right">
+      <form action="{% url 'movies:delete_review' movie.pk review.pk %}" method="POST">
+        <a href="{% url 'movies:update_review' movie.pk review.pk %}" class="square_btn">수정</a>
+        {% csrf_token %}
+        <input type="submit" class="square_btn" value="삭제">
+      </form>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+  {% endfor %}
+</div>
+  
+
+{% if lock == 'false' %}
+  {% if updating == 'true' %}
+  <div id="bookmark"></div>
+  {% else %}
+  <div></div>
+  {% endif %}
+  <form class="mb-5" action="" method="POST">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    <button class="mt-2 btn btn-info">글쓰기</button>
+  </form>
+{% else %}
+<div class="mb-5 mt-2 text-center">
+  리뷰는 한 번만 작성하실 수 있어요.ㅇㅅㅇ!
+</div>
+  
+{% endif %}
+
+
+<style>
+
+  .backdrop {
+    position: relative;
+    background-color: rgba(255, 255, 255, 0.7);
+    
+  }
+  .backdrop::after {
+    content: "";
+    
+    background: url('{{ backdrop_path }}') no-repeat;
+    background-size: cover;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    position: absolute;
+    z-index: -1;   
+  }
+
+</style>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script>
+  var img = document.getElementById('poster-img')
+  if (img.src.slice(31,img.src.length).indexOf('/') !== 0 ) {
+    img.src = img.src.slice(31,img.src.length)
+  }
+
+  const likeBtns = document.querySelectorAll('.like-btn')
+  likeBtns.forEach(function(btn) {
+    btn.addEventListener('mouseover', function(event) {
+      btn.getElementsByTagName('i')[0].classList.add('animate__animated', 'animate__rubberBand')
+
+    })
+    btn.addEventListener('mouseout', function(event) {
+      btn.getElementsByTagName('i')[0].classList.remove('animate__animated', 'animate__rubberBand')
+
+    })
+    btn.addEventListener('click', function(event) {
+      axios.get(`/movies/${btn.dataset.pk}/like`)
+        .then(function(res) {
+          if (res.data.liked) {
+            btn.getElementsByTagName('i')[0].style.color = 'crimson'
+          } else {
+            btn.getElementsByTagName('i')[0].style.color = 'white'
+          }
+          const cntSpan = document.querySelector(`.cnt-${btn.dataset.pk}`)
+          if (res.data.count) {
+            cntSpan.innerText = res.data.count
+          } else {
+
+            cntSpan.innerText = 0
+          }
+
+        })
+        .catch(function(err) {
+          console.log(err)
+        })
+    })
+  })
+
+  function getOffsetTop(el) {
+    var top = 0;
+    if (el.offsetParent) {
+      do {
+        top += el.offsetTop;
+      } while (el = el.offsetParent);
+      return [top];
+    }
+  }
+  window.scroll(0, getOffsetTop(document.getElementById("bookmark")));
+
+</script>
+
+{% endblock %}

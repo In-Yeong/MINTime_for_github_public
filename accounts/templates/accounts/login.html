@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load static %}
+{% block head %} 로그인 {% endblock %}
+{% block content %}
+    <form class="my-5 mx-auto" action="" method="POST" style="max-width: 30rem;">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <div class="d-flex justify-content-between">
+            <button class="btn btn-info">로그인</button>
+            <a href="{% url 'accounts:kakao_login' %}">
+                <img src="{% static 'img/kakao_login_medium_narrow.png' %}">
+            </a>
+        </div>
+    </form>
+
+{% endblock %}

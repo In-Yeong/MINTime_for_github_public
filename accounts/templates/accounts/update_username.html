@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% block head %} 이름변경 {% endblock %}
+{% block content %}
+<button class="square_btn" onclick="history.back(-1);">뒤로가기</button>
+<form action="" method="POST" class="pt-5 my-5">
+  {% csrf_token %}
+  {% bootstrap_form name_change_from %}
+
+  <button class="btn btn-info">수정</button>
+</form>
+
+<style>
+  form {
+    text-align: center;
+  }
+
+  form .form-group:nth-child(3) {
+    display: none;
+  }
+
+  input {
+    width: 50% !important;
+    min-width: 20rem !important;
+    margin: 0 auto;
+  }
+
+  label {
+    color: white;
+  }
+</style>
+
+<script>
+  var label = document.getElementsByTagName('label')[0]
+  label.innerText = '변경할 닉네임을 입력해주세요.'
+  var small = document.getElementsByTagName('small')[0]
+  small.classList.remove('text-muted')
+</script>
+{% endblock %}

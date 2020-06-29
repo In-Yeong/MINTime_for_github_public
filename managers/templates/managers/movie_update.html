@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load staticfiles %}
+{% block head %}영화 수정{% endblock %}
+{% block content %}
+
+<button class="square_btn" onclick="history.back(-1);">뒤로가기</button>
+<div class="d-flex justify-content-center mt-2">
+  <h1 class="font-weight-bold">영화수정</h1>
+</div>
+
+<form class="mb-5" action="" method="POST">
+  {% csrf_token %}
+  {% bootstrap_form form %}
+  <div id="hiddenGenres" hidden=True>{{ genres }}</div>
+
+  <a onclick="pop()" class="btn btn-info">포스터 변경</a>
+  <a onclick="popBack()" class="btn btn-info">배경 변경</a>
+
+  <button class="float-right btn btn-info">제출</button>
+</form>
+
+<script>
+  var genress = document.getElementsByClassName('form-check')
+  console.log(genress)
+  for(var genre of genress) {
+    genre.classList.add('d-inline-block')
+    genre.classList.add('m-1')
+  }
+
+  var languageSearch = document.createElement( 'a' );
+  languageSearch.classList.add('btn');
+  languageSearch.classList.add('btn-info');
+  languageSearch.innerText='표기법 조회'
+  languageSearch.href = 'https://eminwon.qia.go.kr/common/CountrySP.jsp'
+  languageSearch.target = '_blank'
+  var title = document.getElementById('id_original_language').parentElement
+  title.appendChild(languageSearch)
+
+  document.cookie = `selected_img=''`
+  function pop() {
+    var title = document.getElementById('id_title').value
+    if (title === '') {
+      alert('제목을 먼저 입력해주세요!')
+    } else {
+      var domain_num = window.location.href.indexOf('/', 8)
+      var url = window.location.href.slice(0,domain_num+1) +'managers/movies/image/'+title;
+      var name = "image-search";
+      var option = "width = 500, height = 500, top = 100, left = 200, location = no"
+      window.open(url, name, option);
+    }
+  }
+
+  document.cookie = `selected_back=''`
+  function popBack() {
+    var title = document.getElementById('id_title').value
+    if (title === '') {
+      alert('제목을 먼저 입력해주세요!')
+    } else {
+      var domain_num = window.location.href.indexOf('/', 8)
+      var url = window.location.href.slice(0,domain_num+1) +'managers/movies/image/back/'+title;
+      var name = "image-search";
+      var option = "width = 500, height = 500, top = 100, left = 200, location = no"
+      window.open(url, name, option);
+    }
+  }
+
+  let genres = document.getElementById('hiddenGenres').innerText
+  for(var i=0; i<19; i++) {
+    target = document.getElementById(`id_genres_${i}`)
+    if (genres.includes(target.value)) {
+      target.checked=true;
+    }
+    console.log(target.value)
+  }
+</script>
+
+{% endblock %}

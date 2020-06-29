@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load staticfiles %}
+{% block head %}현재 상영작{% endblock %}
+{% block content %}
+<button class="square_btn" onclick="history.back(-1);">뒤로가기</button>
+<div class="backdrop row m-0 my-5">
+  <div class="col-12 col-md-3 align-self-center my-3" style="height: 100%;">
+    <a href="{{ response.link }}">
+      <img src="{{ response.image }}" onerror="this.src='{% static 'img/no_photo.png' %}'" id="poster-img"  style="width: 75%; max-width: 10rem;" alt="...">
+    </a>     
+  </div>
+  
+  <div class="col-12 col-md-9 text-dark">
+    <h3 class="mt-3">{{ movie_info.movieNm }}</h3>
+    <div>
+      장르: 
+      {% for genre in movie_info.genres %}
+          {{ genre.genreNm }}
+      {% endfor %}
+    </div>
+    <hr>
+    <div>{{ movie_info.openDt|slice:":4" }}년 {{ movie_info.openDt|slice:"4:6" }}월 {{ movie_info.openDt|slice:"6:" }}일 개봉</div>
+    <div>
+      감독: 
+      {% for director in movie_info.directors %}
+        {{ director.peopleNm }}
+      {% endfor %}
+    </div>
+    <div>
+      배우: 
+      {% for actor in movie_info.actors %}
+        {{ actor.peopleNm }}
+      {% endfor %}
+    </div>
+    <hr>
+  </div>
+</div>
+
+<style>
+  .backdrop {
+    position: relative;
+    background-color: rgba(255, 255, 255, 0.7);
+    
+  }
+  .backdrop::after {
+    content: "";
+    
+    background: url('{% static 'img/admission.jpg' %}') no-repeat;
+    background-size: cover;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    position: absolute;
+    z-index: -1;   
+  }
+
+</style>
+{% endblock %}

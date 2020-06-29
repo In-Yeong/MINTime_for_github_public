@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load bootstrap_pagination %}
+{% load staticfiles %}
+{% block head %}영화목록{% endblock %}
+{% block content %}
+
+
+<div id="carouselExampleControls" class="carousel slide p-3" data-ride="carousel">
+  <div class="carousel-inner">
+    <div class="carousel-item active"
+      OnClick="window.open('https://map.kakao.com/?from=total&nil_suggest=btn&q=%EC%9E%90%EB%8F%99%EC%B0%A8%20%EA%B7%B9%EC%9E%A5&tab=place')"
+      style="cursor:pointer;">
+      <img src="{% static 'img/event_3.jpg' %}" class="d-block w-100" alt="...">
+    </div>
+    <div class="carousel-item" OnClick="location.href ='{% url 'premium:event' %}'" style="cursor:pointer;">
+      <img src="{% static 'img/event_1.jpg' %}" class="d-block w-100" alt="...">
+    </div>
+    <div class="carousel-item" OnClick="location.href ='{% url 'community:post_create' %}'" style="cursor:pointer;">
+      <img src="{% static 'img/event_2.jpg' %}" class="d-block w-100" alt="...">
+    </div>
+
+  </div>
+  <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="sr-only">Previous</span>
+  </a>
+  <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="sr-only">Next</span>
+  </a>
+</div>
+
+
+<div class="row">
+  <div class="col-12 col-lg-2">
+    {% if search_page %}
+    <div></div>
+    {% else %}
+    <form class="mt-5" action="" method="get">
+      <div class="row m-0">
+        <div class="w-100 my-2">
+          <div class="w-100 btn-group btn-group-sm btn-group-vertical" role="group">
+            <button class="btn b-panel" style="background-color: rgba(255, 255, 255, 0.1);" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+              장르 필터 
+            </button>
+            <div class="collapse mt-2 " id="collapseExample">
+              {% for genre in genres %}
+              <label class="btn col text-left" style="background-color: rgba(255, 255, 255, 0.1);">
+                <input type="checkbox" name="list_genre" value="{{ genre }}"><label>{{ genre }}</label>
+              </label>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        <div class="w-100 my-2">
+          <div class="w-100 btn-group btn-group-sm btn-group-vertical" role="group">
+            {% for time in times %}
+            <label class="btn" style="background-color: rgba(255, 255, 255, 0.1);">
+              <input type="radio" name="list_time" value="{{ time }}"><label>{{ time }}</label>
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="w-100 my-2">
+          <div class="w-100 btn-group btn-group-sm btn-group-vertical" role="group">
+            {% for date in dates %}
+            <label class="btn" style="background-color: rgba(255, 255, 255, 0.1);">
+              <input type="radio" name="list_date" value="{{ date }}"><label>{{ date }}</label>
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-info mb-5 float-right" >선택완료</button>
+    </form>
+    {% endif %}
+  </div>
+  {% if no_movie == 'True' %}
+  <div class="col-12 col-lg-10 row mt-5 m-0" style="width: 100%;">
+    <h2 class="mx-3">조건을 만족하는 영화가 없습니다.</h2>
+  </div>
+  {% endif %}
+  <div class="col-12 col-lg-10">
+    <div class="row mt-5 m-0" style="width: 100%;">
+      {% for movie in page_obj %}
+      <div class="col-6 col-md-4 mb-4" style="cursor:pointer;">
+        <div class="card h-100 position-relative">
+          <div class="imageDiv h-100" >
+            <img src="https://image.tmdb.org/t/p/w500{{movie.poster_path}}"  onerror="this.src='{% static 'img/no_photo.png' %}'" class="h-100 card-img-top poster-img" alt="...">
+          </div>
+          <div class="desc position-absolute w-100 h-100 text-center">
+            <div class="position-absolute" OnClick="location.href ='{% url 'movies:detail' movie.pk %}'" style="top: 0; bottom: 3.5rem; width: 100%;"></div>
+            <div class="card-title text-truncate"  style="background-color: rgba(86, 189, 190, 0.5); font-size:calc(12px + 1vw); padding: 3vw 0;">{{ movie.title }}</div>
+            <div class="text-truncate" style="font-size:calc(8px + 1vw); padding: 1vw 0 0;">{{ movie.genres }}</div>
+            <div style="font-size:calc(8px + 1vw); padding: 1vw 0 0;">{{ movie.runtime }}분</div>
+            {% if user.is_authenticated %}
+              <div class="position-absolute row align-items-center text-center rounded-circle bg-info mx-auto like-btn" data-pk="{{movie.pk}}" style="width: 3rem; height: 3rem; bottom: 0.5rem; left: 50%; transform: translateX(-50%);">
+              {% if user in movie.like_users.all %}          
+                <i class="mx-auto fas fa-heart fa-lg" data-pk="{{movie.pk}}" style="color:crimson"></i>
+              {% else %}
+                <i class="mx-auto fas fa-heart fa-lg" data-pk="{{movie.pk}}" style="color:white"></i>
+              {% endif %}
+              </div>
+            {% endif %}
+          </div>     
+        </div>
+      </div>
+      <div id="bookmark"></div>
+      {% endfor %}
+    </div>
+    <div class="my-5 d-flex justify-content-center">
+      {% bootstrap_paginate page_obj range=5 show_prev_next="false" show_first_last="true" %}
+    </div>
+  </div>
+</div>
+
+{% if premium%}
+{% else %}
+<div class="row align-items-center text-center ml-auto fixed-bottom mr-3 mb-3 rounded-circle bg-info"
+  OnClick="location.href ='{% url 'premium:event' %}'" style="cursor:pointer; width: 5rem; height: 5rem;">
+  <div class="mx-auto">
+    <div style="margin-bottom: -0.6rem;"><small class="font-weight-bold">프리미엄</small></div>
+    <div><small class="font-weight-bold">50% 할인!</small></div>
+  </div>
+</div>
+{% endif %}
+
+
+<style>
+  .b-panel::after {
+    content: "\f107";
+    color: #333;
+    right: 10px;
+    position: absolute;
+      font-family: "FontAwesome"
+  }
+
+  .b-panel[aria-expanded="true"]::after {
+    content: "\f106";
+  }
+
+  .imageDiv {
+    z-index: 1;
+  }
+
+  .card:hover .imageDiv {
+    z-index: 0;
+    opacity: 0.3;
+
+  }
+
+  .card {
+    transition: transform .3s;
+  }
+
+  .card:hover {
+    transform: scale(1.1);
+  }
+</style>
+
+<script>
+
+  for (var img of document.getElementsByClassName("poster-img")) {
+    if (img.src.slice(31, img.src.length).indexOf('/') !== 0) {
+      img.src = img.src.slice(31, img.src.length)
+    }
+  }
+
+
+  const likeBtns = document.querySelectorAll('.like-btn')
+  likeBtns.forEach(function (btn) {
+    btn.addEventListener('mouseover', function (event) {
+      btn.getElementsByTagName('i')[0].classList.add('animate__animated', 'animate__rubberBand')
+
+    })
+    btn.addEventListener('mouseout', function (event) {
+      btn.getElementsByTagName('i')[0].classList.remove('animate__animated', 'animate__rubberBand')
+
+    })
+    btn.addEventListener('click', function (event) {
+      axios.get(`/movies/${btn.dataset.pk}/like`)
+        .then(function (res) {
+          if (res.data.liked) {
+            btn.getElementsByTagName('i')[0].style.color = 'crimson'
+          } else {
+            btn.getElementsByTagName('i')[0].style.color = 'white'
+          }
+
+        })
+        .catch(function (err) {
+          console.log(err)
+        })
+    })
+  })
+  function getOffsetTop(el) {
+    var top = 0;
+    if (el.offsetParent) {
+      do {
+        top += el.offsetTop;
+      } while (el = el.offsetParent);
+      return [top];
+    }
+  }
+  window.scrollTo({top: getOffsetTop(document.getElementById("bookmark")), behavior:'smooth'});
+
+</script>
+
+{% endblock %}

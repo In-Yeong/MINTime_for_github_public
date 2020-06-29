@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load static %}
+{% block head %} 로그인 {% endblock %}
+{% block content %}
+<button class="square_btn" onclick="history.back(-1);">뒤로가기</button>
+<div class="d-flex justify-content-center mt-2">
+  <div class="alert alert-warning" role="alert">
+    <h5 class="font-weight-bold">페이지를 찾을 수 없어요..ㅠ</h5>
+  </div>
+</div>
+<div class="d-flex justify-content-center mt-2 mb-5">
+  <img src="{% static 'img/DB없음.png' %}" alt="" style="width: 50%; min-width: 20rem;">
+</div>
+
+{% endblock %}

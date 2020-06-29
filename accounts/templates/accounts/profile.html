@@ -1,0 +1,474 @@
+{% extends 'base.html' %}
+{% load bootstrap_pagination %}
+{% load staticfiles %}
+{% block head %} 프로필 {% endblock %}
+{% block content %}
+
+<div class="mt-2 text-center mx-auto border-bottom border-top border-dark"
+  style="min-width: 20rem; background-color: rgba(255, 255, 255, 0.1)">
+  <div>
+    <h2 class="d-inline-block m-0 custom-break-word">{{ person.username }}</h2>
+    {% if person == request.user %}
+    <a class="badge badge-info my-auto" href="{% url 'accounts:update_username' %}">닉네임 수정</a>
+    {% else %}
+    <div></div>
+    {% endif %}
+  </div>
+  <div>
+    {% if premium %}
+    <div class="mt-2">
+      <h5 class="custom-break-word">{{ person.username }}님은 프리미엄 회원입니다.</h5>
+      <!-- Button trigger modal -->
+      {% if person == request.user %}
+      <button class="golden-btn mt-3" data-toggle="modal" data-target="#exampleModal">맞춤 상영예정작</button>
+      <div class="mb-3"><small>좋아요 표시한 영화가 많을수록 정확해집니다!</small></div>
+      {% else %}
+      <div></div>
+      {% endif %}
+    </div>
+    {% else %}
+    <div class="mt-2">
+      <h5 class="custom-break-word">{{ person.username }}님은 일반 회원입니다.</h5>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" style="max-width: 80%; width: auto; display: table;">
+    <div class="modal-content">
+      {% if recom_response|length %}
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">추천하는 상영예정작</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body row">
+        {% for rec in recom_response %}
+        <div class="col-12" style="background-image: url(https://image.tmdb.org/t/p/original{{ rec.backdrop_path }});">
+          <div class="card" style="width: auto; background-color: rgba(255, 255, 255, 0.2);">
+            <div class="card my-auto" style="max-width: 100%; background-color: rgba(255, 255, 255, 0.5);">
+              <div class="row no-gutters" >
+                <div class="col-12 col-md-4 align-self-center">
+                  <img src="https://image.tmdb.org/t/p/original{{ rec.poster_path }}" alt="" style="width: 100%;">
+                </div>
+                <div class="col-12 col-md-8">
+                  <div class="card-body">
+                    <h5 class="card-title font-weight-bold">{{ rec.title }}</h5>
+                    <p class="card-text font-weight-bold">{{ rec.overview }}</p>
+                    <p class="card-text font-weight-bold"><small>개봉예정일 : {{ rec.release_date }}</small></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor%}
+      </div>
+      {% endif %}
+      {% if upcom_response|length %}
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">상영예정작</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body row">
+        {% for upc in upcom_response %}
+        <div class="col-12" style="background-image: url(https://image.tmdb.org/t/p/original{{ upc.backdrop_path }});">
+          <div class="card" style="width: auto; background-color: rgba(255, 255, 255, 0.2);">
+            <div class="card my-auto" style="max-width: 100%; background-color: rgba(255, 255, 255, 0.5);">
+              <div class="row no-gutters" >
+                <div class="col-12 col-md-4 align-self-center">
+                  <img src="https://image.tmdb.org/t/p/original{{ upc.poster_path }}" alt="" style="width: 100%;">
+                </div>
+                <div class="col-12 col-md-8">
+                  <div class="card-body">
+                    <h5 class="card-title font-weight-bold">{{ upc.title }}</h5>
+                    <p class="card-text font-weight-bold">{{ upc.overview }}</p>
+                    <p class="card-text font-weight-bold"><small>개봉예정일 : {{ upc.release_date }}</small></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor%}
+      </div>
+      {% endif %}
+      <div class="modal-footer">
+        <button type="button" class="btn btn-info" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if person == request.user %}
+<div class="w-100 my-5">
+  <div class="w-100 btn-group btn-group-sm overflow-auto" role="group">
+    <button id="btn-0" class="btn btn-outline-light my-2 my-sm-0"
+      onclick="location.href='{% url 'accounts:profile' person.username 0 %}'">추천 영화</button>
+    <button id="btn-1" class="btn btn-outline-light my-2 my-sm-0"
+      onclick="location.href='{% url 'accounts:profile' person.username 1 %}'">작성한 게시글</button>
+    <button id="btn-2" class="btn btn-outline-light my-2 my-sm-0"
+      onclick="location.href='{% url 'accounts:profile' person.username 2 %}'">작성한 댓글</button>
+    <button id="btn-3" class="btn btn-outline-light my-2 my-sm-0"
+      onclick="location.href='{% url 'accounts:profile' person.username 3 %}'">좋아요한 영화</button>
+    <button id="btn-4" class="btn btn-outline-light my-2 my-sm-0"
+      onclick="location.href='{% url 'accounts:profile' person.username 4 %}'">작성한 리뷰</button>
+  </div>
+</div>
+{% else %}
+<div class="w-100 my-5">
+  <div class="w-100 btn-group btn-group-sm overflow-auto" role="group">
+    <button id="btn-1" class="btn btn-outline-light my-2 my-sm-0"
+      onclick="location.href='{% url 'accounts:profile' person.username 1 %}'">작성한 게시글</button>
+    <button id="btn-2" class="btn btn-outline-light my-2 my-sm-0"
+      onclick="location.href='{% url 'accounts:profile' person.username 2 %}'">작성한 댓글</button>
+    <button id="btn-3" class="btn btn-outline-light my-2 my-sm-0"
+      onclick="location.href='{% url 'accounts:profile' person.username 3 %}'">좋아요한 영화</button>
+    <button id="btn-4" class="btn btn-outline-light my-2 my-sm-0"
+      onclick="location.href='{% url 'accounts:profile' person.username 4 %}'">작성한 리뷰</button>
+  </div>
+</div>
+{% endif %}
+
+{% if pur_pk == 0 %}
+{% if situation_code == 1 %}
+{% if recom_movies %}
+<div class="row mt-5 m-0" style="width: 100%;">
+  {% for movie in page_obj %}
+  <div class="col-6 col-md-4 mb-4" style="cursor:pointer;">
+    <div class="card card-move h-100 position-relative">
+      <div class="imageDiv h-100">
+        <img src="https://image.tmdb.org/t/p/w500{{movie.poster_path}}"
+          onerror="this.src='{% static 'img/no_photo.png' %}'" class="h-100 card-img-top poster-img" alt="...">
+      </div>
+      <div class="desc position-absolute w-100 h-100 text-center">
+        <div class="position-absolute" OnClick="location.href ='{% url 'movies:detail' movie.pk %}'"
+          style="top: 0; bottom: 3.5rem; width: 100%;"></div>
+        <div class="card-title text-truncate"
+          style="background-color: rgba(86, 189, 190, 0.5); font-size:calc(12px + 1vw); padding: 3vw 0;">
+          {{ movie.title }}</div>
+        <div class="text-truncate" style="font-size:calc(8px + 1vw); padding: 1vw 0 0;">{{ movie.genres }}</div>
+        <div style="font-size:calc(8px + 1vw); padding: 1vw 0 0;">{{ movie.runtime }}분</div>
+        {% if user.is_authenticated %}
+        <div class="position-absolute row align-items-center text-center rounded-circle bg-info mx-auto like-btn"
+          data-pk="{{movie.pk}}"
+          style="width: 3rem; height: 3rem; bottom: 0.5rem; left: 50%; transform: translateX(-50%);">
+          {% if user in movie.like_users.all %}
+          <i class="mx-auto fas fa-heart fa-lg" data-pk="{{movie.pk}}" style="color:crimson"></i>
+          {% else %}
+          <i class="mx-auto fas fa-heart fa-lg" data-pk="{{movie.pk}}" style="color:white"></i>
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+<div class="my-5 d-flex justify-content-center">
+  {% bootstrap_paginate page_obj range=5 show_prev_next="false" show_first_last="true" %}
+</div>
+{% endif %}
+{% else %}
+{% if like_movies %}
+
+<div class="d-flex justify-content-center mt-2">
+  <div class="alert alert-warning" role="alert">
+    <h5 class="font-weight-bold">저희 DB에는 더 이상 추천해드릴 영화가 없어요..ㅠ</h5>
+  </div>
+</div>
+<div class="d-flex justify-content-center mt-2 mb-5">
+  <img src="{% static 'img/DB없음.png' %}" alt="" style="width: 50%; min-width: 20rem;">
+</div>
+{% else %}
+
+<div class="d-flex justify-content-center mt-2">
+  <div class="alert alert-warning no-like-warning" role="alert" OnClick="location.href ='{% url 'movies:index' %}'">
+    <div class="font-weight-bold">
+      좋아요한 영화가 없어서 추천해드리기 어려워요..ㅠ<br>
+      클릭하시면 영화 목록을 보여드려요<br>
+      ㅇㅅㅇ!
+    </div>
+  </div>
+</div>
+<div class="d-flex justify-content-center mt-2 mb-5">
+  <img src="{% static 'img/Like없음.png' %}" alt="" style="width: 50%; min-width: 20rem;">
+</div>
+
+{% endif %}
+{% endif %}
+{% elif pur_pk == 4 %}
+<table class="table row m-0">
+  <thead class="col-12 thead-dark">
+    <tr class="row w-100 m-0">
+      <th scope="col" class="col-1 p-1 text-center">#</th>
+      <th scope="col" class="col-7 col-md-8 p-1">리뷰</th>
+      <th scope="col" class="col-4 col-md-3 p-1 text-center">별점</th>
+    </tr>
+  </thead>
+  <tbody class="col-12">
+    {% for review in page_obj4 %}
+    <tr class="row m-0" onclick="location.href='{% url 'movies:detail' review.movie.pk %}'">
+      <th class="col-1 p-1 text-center">{{ review.id }}</th>
+      <td class="col-7 col-md-8 p-1 text-truncate" colspan="2">{{ review.movie.title }}</td>
+      <td class="col-4 col-md-3 p-1 text-center">
+        {% if review.star == 1 %}
+        ★☆☆☆☆
+        {% elif review.star == 2 %}
+        ★★☆☆☆
+        {% elif review.star == 3 %}
+        ★★★☆☆
+        {% elif review.star == 4 %}
+        ★★★★☆
+        {% else %}
+        ★★★★★
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<div class="d-flex justify-content-center my-5">
+  {% bootstrap_paginate page_obj4 range=5 show_prev_next="false" show_first_last="true" %}
+</div>
+<hr>
+{% elif pur_pk == 1 %}
+<table class="table row m-0">
+  <thead class="col-12 thead-dark">
+    <tr class="row w-100 m-0">
+      <th scope="col" class="col-1 p-1 text-center">#</th>
+      <th scope="col" class="col-3 col-md-2 p-1">게시판</th>
+      <th scope="col" class="col-5 col-md-7 p-1">제목</th>
+      <th scope="col" class="col-3 col-md-2 p-1 text-center">댓글</th>
+    </tr>
+  </thead>
+  <tbody class="col-12">
+    {% for post in page_obj1 %}
+    <tr class="row m-0" onclick="location.href='{% url 'community:post_detail' post.pk %}'">
+      <th class="col-1 p-1 text-center">{{ post.id }}</th>
+      <td class="col-3 col-md-2 p-1">
+        {% if post.purpose == 1 %}
+        자유
+        {% elif post.purpose == 2 %}
+        건의
+        {% else %}
+        추천
+        {% endif %}
+      </td>
+      <td class="col-5 col-md-7 p-1 text-truncate">{{ post.title }}</td>
+      <td class="col-3 col-md-2 p-1 font-weight-bolder text-center">{{ post.comment_p_set.all|length }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<div class="d-flex justify-content-center my-5">
+  {% bootstrap_paginate page_obj1 range=5 show_prev_next="false" show_first_last="true" %}
+</div>
+<hr>
+{% elif pur_pk == 2 %}
+<table class="table row m-0">
+  <thead class="col-12 thead-dark">
+    <tr class="row w-100 m-0">
+      <th scope="col" class="col-1 p-1 text-center">#</th>
+      <th scope="col" class="col-11 p-1">댓글</th>
+    </tr>
+  </thead>
+  <tbody class="col-12">
+    {% for comment in page_obj2 %}
+    <tr class="row m-0" onclick="location.href='{% url 'community:post_detail' comment.post.pk %}'">
+      <th class="col-1 p-1 text-center">{{ comment.id }}</th>
+      <td class="col-11 p-1 text-truncate">{{ comment.content }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<div class="d-flex justify-content-center my-5">
+  {% bootstrap_paginate page_obj2 range=5 show_prev_next="false" show_first_last="true" %}
+</div>
+<hr>
+{% elif pur_pk == 3 %}
+<table class="table row m-0">
+  <thead class="col-12 thead-dark">
+    <tr class="row w-100 m-0">
+      <th scope="col" class="col-1 p-1 text-center">#</th>
+      <th scope="col" class="col-7 col-md-8 p-1">영화</th>
+      <th scope="col" class="col-4 col-md-3 p-1 text-center"></th>
+    </tr>
+  </thead>
+  <tbody class="col-12">
+    {% for movie in page_obj3 %}
+    <tr class="row m-0">
+      <th class="col-1 p-1 text-center" onclick="location.href='{% url 'movies:detail' movie.pk %}'">{{ movie.id }}</th>
+      <td class="col-7 col-md-8 p-1 text-truncate" onclick="location.href='{% url 'movies:detail' movie.pk %}'">{{ movie.title }}</td>
+      <td class="col-4 col-md-3 p-1 text-center">
+        {% if user.is_authenticated %}
+        {% if person in movie.like_users.all %}
+        <i class="fas fa-heart fa-lg like-btn2" data-pk="{{movie.pk}}" style="color:crimson"></i>
+
+        {% else %}
+        <i class="fas fa-heart fa-lg like-btn2" data-pk="{{movie.pk}}" style="color:black"></i>
+
+        {% endif %}
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<div class="d-flex justify-content-center my-5">
+  {% bootstrap_paginate page_obj3 range=5 show_prev_next="false" show_first_last="true" %}
+</div>
+{% endif %}
+
+<style>
+  tbody tr {
+    background-color: white;
+  }
+
+  tbody tr:hover {
+    background-color: powderblue;
+  }
+
+  .imageDiv {
+    z-index: 1;
+  }
+
+  .card:hover .imageDiv {
+    z-index: 0;
+    opacity: 0.3;
+  }
+
+  .card-move {
+    transition: transform .3s;
+  }
+
+  .card-move:hover {
+    transform: scale(1.05);
+  }
+
+  .no-like-warning:hover {
+    opacity: 0.8;
+  }
+  .golden-btn+.golden-btn {
+    margin-top: 1em;
+  }
+
+  .golden-btn {
+    display: inline-block;
+    outline: none;
+    font-family: inherit;
+    font-size: 1em;
+    box-sizing: border-box;
+    border: none;
+    border-radius: .3em;
+    height: 2.75em;
+    line-height: 2.5em;
+    text-transform: uppercase;
+    padding: 0 1em;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, .16), 0 3px 6px rgba(110, 80, 20, .4),
+      inset 0 -2px 5px 1px rgba(139, 66, 8, 1),
+      inset 0 -1px 1px 3px rgba(250, 227, 133, 1);
+    background-image: linear-gradient(160deg, #a54e07, #b47e11, #fef1a2, #bc881b, #a54e07);
+    border: 1px solid #a55d07;
+    color: rgb(120, 50, 5);
+    text-shadow: 0 2px 2px rgba(250, 227, 133, 1);
+    cursor: pointer;
+    transition: all .2s ease-in-out;
+    background-size: 100% 100%;
+    background-position: center;
+  }
+
+  .golden-btn:focus,
+  .golden-btn:hover {
+    background-size: 150% 150%;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23),
+      inset 0 -2px 5px 1px #b17d10,
+      inset 0 -1px 1px 3px rgba(250, 227, 133, 1);
+    border: 1px solid rgba(165, 93, 7, .6);
+    color: rgba(120, 50, 5, .8);
+  }
+
+  .golden-btn:active {
+    box-shadow: 0 3px 6px rgba(0, 0, 0, .16), 0 3px 6px rgba(110, 80, 20, .4),
+      inset 0 -2px 5px 1px #b17d10,
+      inset 0 -1px 1px 3px rgba(250, 227, 133, 1);
+  }
+
+</style>
+
+<script>
+
+  var btnSubNum = window.location.href.slice(-2)
+  if (btnSubNum.slice(1) !== '/') {
+    var btnNum = window.location.href[window.location.href.indexOf('/?') - 1]
+  } else {
+    var btnNum = btnSubNum.slice(0, 1)
+  }
+
+  document.getElementById(`btn-${btnNum}`).classList.add('active')
+
+
+  const likeBtns = document.querySelectorAll('.like-btn')
+  likeBtns.forEach(function (btn) {
+    btn.addEventListener('mouseover', function (event) {
+      btn.getElementsByTagName('i')[0].classList.add('animate__animated', 'animate__rubberBand')
+
+    })
+    btn.addEventListener('mouseout', function (event) {
+      btn.getElementsByTagName('i')[0].classList.remove('animate__animated', 'animate__rubberBand')
+
+    })
+    btn.addEventListener('click', function (event) {
+      axios.get(`/movies/${btn.dataset.pk}/like`)
+        .then(function (res) {
+          if (res.data.liked) {
+            btn.getElementsByTagName('i')[0].style.color = 'crimson'
+          } else {
+            btn.getElementsByTagName('i')[0].style.color = 'white'
+          }
+
+        })
+        .catch(function (err) {
+          console.log(err)
+        })
+    })
+  })
+
+  const likeBtns2 = document.querySelectorAll('.like-btn2')
+  likeBtns2.forEach(function (btn) {
+    btn.addEventListener('mouseover', function (event) {
+      btn.classList.add('animate__animated', 'animate__rubberBand')
+
+    })
+    btn.addEventListener('mouseout', function (event) {
+      btn.classList.remove('animate__animated', 'animate__rubberBand')
+
+    })
+    btn.addEventListener('click', function (event) {
+      axios.get(`/movies/${btn.dataset.pk}/like`)
+        .then(function (res) {
+          if (res.data.liked) {
+            btn.style.color = 'crimson'
+          } else {
+            btn.style.color = 'black'
+            btn.parentElement.parentElement.hidden = true
+          }
+
+        })
+        .catch(function (err) {
+          console.log(err)
+        })
+    })
+  })
+
+</script>
+{% endblock %}

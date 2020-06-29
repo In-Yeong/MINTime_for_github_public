@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+{% load bootstrap4 %}
+{% load staticfiles %}
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0 width=device-width">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>{% block head %}{% endblock %}</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+  <!-- font-awesome -->
+  <script src="https://kit.fontawesome.com/8531e3adef.js" crossorigin="anonymous"></script>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.0.0/animate.min.css" />
+
+  <link rel="stylesheet"href="https://fonts.googleapis.com/css?family=Noto Sans KR">
+  <link rel="icon" type="image/jpg" sizes="16x16" href="/static/img/favicon.jpg">
+  {% bootstrap_css %}
+</head>
+
+<body class=" h-100" style="background: linear-gradient(rgba(86, 189, 190, 1), rgba(57, 83, 112, 1), rgba(57, 83, 112, 1), rgba(57, 83, 112, 1));">
+
+  <nav class="navbar navbar-expand-md navbar-dark " >
+    <a class="navbar-brand" href="{% url 'movies:index' %}">MINTime</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a id="nav-mov" href="{% url 'movies:index' %}" class="nav-link" style="color: white;">영화</a>
+        </li>
+        <li class="nav-item">
+          <a id="nav-com" href="{% url 'community:posts' %}" class="nav-link" style="color: white;">커뮤니티</a>
+        </li>
+        {% if request.user.is_staff %}
+        <li class="nav-item">
+          <a id="nav-man" href="{% url 'managers:index' %}" class="nav-link" style="color: white;">관리</a>
+        </li>
+        {% endif %}
+        <li class="nav-item">
+          <a id="nav-map" href="{% url 'maps:index' %}" class="nav-link" style="color: white;">영화관 찾기</a>
+        </li>
+      </ul>
+      {% if request.resolver_match.app_name == 'community' %}
+      <form class="form-inline my-2 my-lg-0" action="{% url 'community:post_search' %}" method="get">
+        <input class="form-control mr-sm-2" type="search" placeholder="검색" aria-label="Search" id="q" name="q"
+          value="{{ q }}">
+      </form>
+      {% elif request.resolver_match.app_name == 'managers' %}
+      <form class="form-inline my-2 my-lg-0" action="{% url 'managers:movies_search' %}" method="get">
+        <input class="form-control mr-sm-2" type="search" placeholder="검색" aria-label="Search" id="q" name="q"
+          value="{{ q }}">
+      </form>
+      {% else %}
+      <form class="form-inline my-2 my-lg-0" action="{% url 'movies:search' %}" method="get">
+        <input class="form-control mr-sm-2" type="search" placeholder="검색" aria-label="Search" id="q" name="q"
+          value="{{ q }}">
+      </form>
+      {% endif %}
+      <div hidden=true id="easterEgg1">{{ easterEgg1 }}</div>
+      <div>
+        {% if request.user.is_authenticated %}
+        <div class="btn-group float-right">
+          <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+            aria-expanded="false">
+            <div class="d-inline-block text-truncate justify-content-center" style="max-width: 6rem;">{{ request.user.username }}</div>
+            <div class="d-inline-block text-truncate">님</div>
+          </button>
+          <div class="dropdown-menu dropdown-menu-right">
+            <a href="{% url 'accounts:profile' user.username 0 %}" class="dropdown-item">마이페이지</a>
+            {% if request.user.email %}
+            <div class="alert    alert-warning    alert-dismissable">
+              연결을 끊을 시 <strong>모든 정보</strong>가 사라집니다.
+            </div>
+            <a href="{% url 'accounts:kakao_unlink' %}" class="dropdown-item">
+              카카오 연결끊기
+            </a>
+            <a href="{% url 'accounts:kakao_logout' %}" class="dropdown-item">카카오 로그아웃</a>
+            {% else %}
+            <a href="{% url 'accounts:logout' %}" class="dropdown-item">로그아웃</a>
+            {% endif %}
+          </div>
+        </div>
+        {% else %}
+        <a href="{% url 'accounts:login' %}" class="btn btn-info">로그인</a>
+        <a href="{% url 'accounts:signup' %}" class="btn btn-info">회원가입</a>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+
+  <div class="container px-1 min-vh-100">
+    {% block content %}
+    {% endblock %}
+  </div>
+
+  <div>
+    <nav class="navbar navbar-expand-md navbar-dark custom-green">
+      <p class="mx-auto my-0" style="font-size: 1vw;"> Copyright 박인영, 이종호 ⓒ 2020. All Rights Reserved.</p>
+    </nav>
+  </div>
+
+  <style>
+
+    * {
+      font-family: 'Noto Sans KR', serif;
+    }
+    pre {
+      font-family: 'Noto Sans KR', serif !important;
+    }
+
+    .bottom {
+      position: absolute;
+      left: 0;
+      bottom: -70vw;
+      width: 100%;
+    }
+
+    .custom-dark {
+      background-color: rgba(57, 83, 112, 1);
+    }
+
+    .custom-red {
+      background-color: rgba(229, 36, 32, 1);
+    }
+
+    .custom-green {
+      background-color: rgba(86, 189, 190, 1);
+    }
+
+    .custom-break-word {
+      word-wrap: break-word;
+      white-space: pre-wrap;
+      white-space: -moz-pre-wrap;
+      white-space: -pre-wrap;
+      white-space: -o-pre-wrap;
+      word-break: break-all;
+    }
+
+    .pagination>li>a,
+    .page-item.disabled .page-link {
+      background-color: rgba(86, 189, 190, 1) !important;
+      color: rgba(57, 83, 112, 1) !important;
+    }
+
+    .page-item.active .page-link {
+      background-color: rgba(56, 123, 124, 1) !important;
+      border-color: rgba(56, 123, 124, 1) !important;
+    }
+
+    ::selection {
+      background-color: rgba(86, 189, 190, 1);
+      ;
+      color: white;
+    }
+
+    ::-webkit-scrollbar {
+      width: 16px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background-color: rgba(86, 189, 190, 1);
+      background-clip: padding-box;
+      border: 0.05em solid #eeeeee;
+    }
+
+    ::-webkit-scrollbar-track {
+      background-color: white;
+    }
+
+    /* Buttons */
+    ::-webkit-scrollbar-button:single-button {
+      background-color: white;
+      display: block;
+      border-style: solid;
+      height: 13px;
+      width: 16px;
+    }
+
+    /* Up */
+    ::-webkit-scrollbar-button:single-button:vertical:decrement {
+      border-width: 0 8px 8px 8px;
+      border-color: transparent transparent gray transparent;
+    }
+
+    /* Down */
+    ::-webkit-scrollbar-button:single-button:vertical:increment {
+      border-width: 8px 8px 0 8px;
+      border-color: gray transparent transparent transparent;
+    }
+
+
+
+
+    .square_btn {
+        display: inline-block;
+        padding: 0.2em 0.6em;
+        text-decoration: none;
+        color: rgba(57, 83, 112, 1);
+        border: solid 2px rgba(57, 83, 112, 1);
+        background-color: rgba(0, 0, 0, 0);
+        border-radius: 3px;
+        transition: .4s;
+        text-decoration: none;
+    }
+
+    .square_btn:hover {
+        background: rgba(57, 83, 112, 1);
+        color: white;
+        text-decoration: none;
+    }
+
+
+  </style>
+
+  <script>
+    window.onload = function () {
+      var target = document.getElementById("easterEgg1").innerText
+      if (target === 'yes1') {
+        var name = document.getElementById("q").value
+        alert(`최고의 개발자 ${name}!`)
+      } else if (target === 'yes2') {
+        var name = document.getElementById("q").value
+        alert(`${name}님의 인생도 한 편의 영화입니다!`)
+      } else if (target === 'yes3') {
+        var name = document.getElementById("q").value
+        alert(`${name}님은 '구미 2반'을 제작한 최고의 감독입니다!`)
+      }
+    }
+
+    var btnSubNum = window.location.href.indexOf('/', 9)
+    var target = (window.location.href.slice(btnSubNum + 1, btnSubNum + 4))
+    if (target === 'mov') {
+      document.getElementById('nav-mov').classList.add('font-weight-bolder');
+    } else if (target === 'com') {
+      document.getElementById('nav-com').classList.add('font-weight-bolder');
+    } else if (target === 'man') {
+      document.getElementById('nav-man').classList.add('font-weight-bolder');
+    } else if (target === 'map') {
+      document.getElementById('nav-map').classList.add('font-weight-bolder');
+    }
+
+  </script>
+
+  {% bootstrap_javascript jquery='full' %}
+</body>
+
+</html>

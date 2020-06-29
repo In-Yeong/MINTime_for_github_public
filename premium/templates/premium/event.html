@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load bootstrap_pagination %}
+{% load staticfiles %}
+{% block head %}이벤트{% endblock %}
+{% block content %}
+<button class="square_btn" onclick="history.back(-1);">뒤로가기</button>
+<img src="{% static 'img/event_poster_1.jpg' %}" class="d-block w-50 mx-auto my-5" alt="...">
+
+<div class="row my-5 mx-auto cart-w">
+    <form method="post" class="col-12 text-center">
+      {% csrf_token %}
+      <button onclick="isPremium(id)" id="kakaopay{{ is_premium }}" class="btn btn-warning mb-5">카카오페이로 2000원 결제하기</button>
+    </form>
+  </div>
+
+<script>
+  function isPremium(status) {
+    if (status === 'kakaopay1') {
+      alert('이미 프리미엄 회원입니다!')
+    }
+  }
+</script>
+
+
+{% endblock %}
